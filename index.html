@@ -1,55 +1,114 @@
 <html>
-  <head></head>
-  <body>
-  おおざっぱな年金概算<br><br>
+<head></head>
+<body>
+<h2>おおざっぱな年金概算</h2><br>
+ 
+【現在の年齢】<br>
+<select id="選1">
+<option value="19">19歳以下</option>
+<option value="20">20</option>
+<option value="21">21</option>
+<option value="22">22</option>
+<option value="23">23</option>
+<option value="24">24</option>
+<option value="25">25</option>
+<option value="26">26</option>
+<option value="27">27</option>
+<option value="28">28</option>
+<option value="29">29</option>
+<option value="30">30</option>
+<option value="31">31</option>
+<option value="32">32</option>
+<option value="33">33</option>
+<option value="34">34</option>
+<option value="35">35</option>
+<option value="36">36</option>
+<option value="37">37</option>
+<option value="38">38</option>
+<option value="39">39</option>
+<option value="40">40</option>
+<option value="41">41</option>
+<option value="42">42</option>
+<option value="43">43</option>
+<option value="44">44</option>
+<option value="45">45</option>
+<option value="46">46</option>
+<option value="47">47</option>
+<option value="48">48</option>
+<option value="49">49</option>
+<option value="50">50</option>
+<option value="51">51</option>
+<option value="52">52</option>
+<option value="53">53</option>
+<option value="54">54</option>
+<option value="55">55</option>
+<option value="56">56</option>
+<option value="57">57</option>
+<option value="58">58</option>
+<option value="59">59</option>
+<option value="60">60</option>
+<option value="61">61</option>
+<option value="62">62</option>
+<option value="63">63</option>
+<option value="64">64</option>
+<option value="65">65歳以上</option>
+</select>
+
+<br><br><br>
+【どちらの収入で計算しますか？】<br>
+<input type="radio" name="選3" id="選3g" onChange="選3c()">月収</input>
+<input type="radio" name="選3" id="選3n" onChange="選3c()">年収</input>
+<br>
+
+<span id="収入万円1"></span><span id="収入万円2"></span>万円
+<div><input type="hidden" min="0" value="25" max="99" step="1" id="収入種別g"></div>
+<div><input type="hidden" min="0" value="250" max="1200" step="10" id="収入種別n"></div>
+
   
-  (未実施の分岐)
-  1. 国民年金 / 厚生年金 / わからない(両方混ぜる)
-  2. 年収 / 月収
-  
-  
-  月収Version<br>
-  <input type="range" value="20" min="0" max="99" step="1" id="月収値"><br>
-  
-  <script>
-  document.write(document.getElementById("月収値").value + "万円");
-  </script><br><br>
-  
-  支払った月数<br>
-  <input type="range" value="36" min="0" max="480" step="1" id="支払月数値"><br>
-  <script>
-  var 選択月数値 = document.getElementById("支払月数値").value;
-  var 年数値 = Math.floor(選択月数値 / 12);
-  var 月数値 = 選択月数値 % 12;
-  document.write(年数値 + "年");
-  if (月数値>0){
-    document.write(月数値 + "ヶ月");
+<br><br><br>【支払ったことのある年金】<br>
+<input type="checkbox" id="選2" value="選国">国民年金</input>
+<input type="checkbox" id="選2" value="選厚">厚生年金</input>
+<input type="checkbox" name="選3" value="選不">わからない</input><br><br>
+
+<script>
+	
+//Radio Buttonの選択状況を取得しFunction
+function 選3c(){
+var x3g = document.getElementById("選3g");
+var x3n = document.getElementById("選3n");
+
+  if (x3g.checked){
+    Bar表示("収入種別g","収入種別n");
+	値表示("収入種別g","月収");
+    }
+	
+  else if (x3n.checked){
+    Bar表示("収入種別n","収入種別g","年収");
+    値表示("収入種別n","年収");
+    }
 }
-  </script><br><br>  
   
-  支払った年金(自己負担分)総額<br>
-  <script>
-  var 支払総額 = document.getElementById("月収値").value * document.getElementById("支払月数値").value * 0.09
-  document.write("→ " + 支払総額 + "万円");
-  </script><br><br>
-  
-  65歳からもらえる年金額<br>
-  <script>
-  var 支払総額 = document.getElementById("月収値").value * document.getElementById("支払月数値").value * 0.09;
-  var 受取年額 = 支払総額 * 0.006;
-  var 受取月額 = Math.floor(支払総額 * 0.006 / 12);
+//Bar表示(Barを表示させるFunction)の宣言
+function Bar表示(x,y){
+	var 現すinp = document.getElementById(x);
+	var 隠すinp = document.getElementById(y);
+	現すinp.type="range";
+	隠すinp.type="hidden";
+	}
 
-  document.write("受取れる年金(月額) → " + 受取月額);
-  document.write("受取れる年金(年額) → " + 受取年額);  
-  </script><br><br>
+//値表示(Barの選択値を表示させるFunction)の宣言
+//最終的には値の変更と同時にReal Timeで変動するかたちにしたい
+function 値表示(x,z){
+	var 現すinp = document.getElementById(x);
+	var 収入種別el1 = document.getElementById("収入万円1");
+    収入種別el1.innerHTML = z;
+	var 収入種別el2 = document.getElementById("収入万円2");
+    収入種別el2.innerHTML = 現すinp.value;
+    }
+
+
+</script>
   
-  <script src="nenkin.js"></script>
-  </body>
+<script src="nenkin.js"></script>
+</body>
 </html>
-
-
-<!-- document.write("<h1>Hello World</h1>"); -->
-<!-- console.log("console") -->
-
-<!-- <script type="text/javascript"> -->
-<!-- alert("Alert!"); -->
