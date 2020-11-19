@@ -56,14 +56,14 @@
 
 <br><br><br>
 【どちらの収入で計算しますか？】<br>
-<input type="radio" name="乱1" id="収入種別radio月" onChange="収入種別func()">月収</input>
-<input type="radio" name="乱1" id="収入種別radio年" onChange="収入種別func()">年収</input>
+<input type="radio" name="乱1" id="収入種別radio月" onChange="収入種別func()" onChange="厚生calc()">月収</input>
+<input type="radio" name="乱1" id="収入種別radio年" onChange="収入種別func()" onChange="厚生calc()">年収</input>
 <br>
 
 
 <span id="収入種別span"></span><span id="収入値span"></span><span id="万円span"></span>
 <div><input type="hidden" min="0" value="25" max="99" step="1" id="月収range" oninput="収入値func(月収range)" onChange="収入値func(月収range)"></div>
-<div><input type="hidden" min="0" value="250" max="1200" step="10" id="年収range" oninput="収入値func(年収range)" onChange="収入値func(年収range)"></div>
+<div><input type="hidden" min="0" value="300" max="1200" step="10" id="年収range" oninput="収入値func(年収range)" onChange="収入値func(年収range)"></div>
 <!-- oninputとonChangeを併用しているのは、oninputがIE10に対応していないらしいので予備として -->
   
 
@@ -74,7 +74,7 @@
 <span id="国民総支払span"></span>
 <br>
 <input type="checkbox" id="厚生年金cb" onChange="年金種別checkFunc(厚生年金cb,厚生年数bar,厚生年数span,厚生総支払span)">厚生年金</input>
-<input type="hidden" min="0" value="10" max="40" step="1" id="厚生年数bar" oninput="厚生支払年数func()" onchange="厚生支払年数func()">
+<input type="hidden" min="0" value="10" max="40" step="1" id="厚生年数bar" oninput="厚生支払年数func()" onChange="厚生支払年数func()">
 <span id="厚生年数span"></span>
 <span id="厚生総支払span"></span>
 <br>
@@ -83,7 +83,9 @@
 
 
 <br><br><br>
-【】
+【何歳まで生きる想定で計算しますか？】<br>
+81歳(平均寿命) (※ボタンで左右に)<br>
+
 
 <br><br>
 --------《計算結果》--------<br>
@@ -97,21 +99,26 @@
 <br><br><br>
 受給できる金額は、<br>
 <div id="国民受給額div"></div>
-月額(金額)円、<br>
+<div id="厚生国民分受給額div"></div>
+<div id="厚生受給額div"></div>
+<div id="合計受給額div"></div>
+<br>
 (年齢)歳まで生きる場合は総額(金額)円になります。<br>
 
 <script>
 //未解決の課題
 //1.年金の支払期間を合計40年間以上にさせないようにする
-//2.厚生年金の計算全般
+//2.寿命によって総受給金額を出す
 //3.計算結果の出力と、未Check項目に応じた文章のHide(うまくまとめて切り替えたい)
+//4.10年未満の支払で受給金額をゼロにする
+//
 
 //Option.年齢(生年)に対応した支払額計算の実装(国民・厚生両方)
 //Option.国民年金の免除期間の実装
+//Option.計算結果を右側に表示する？
 
 	
-	
-//Radio Buttonの選択状況を取得しFunction
+//Radio Buttonの選択状況を取得する
 function 収入種別func(){
 
   if (収入種別radio月.checked){
@@ -136,7 +143,10 @@ function Bar表示func(乱wee,乱ijj,乱mii){
 //宣言:収入値func(Barで入力した収入値を表示させる)
 function 収入値func(乱att){
   収入値span.innerHTML = 乱att.value +"万円";
+  厚生総支払と受給額func()
 }
+
+
 
 
 //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
@@ -170,12 +180,8 @@ function 国民支払年数func(){
   国民総支払func();
   国民受給額func();
 }
-function 厚生支払年数func(){
- 厚生年数span.innerHTML = 厚生年数bar.value +"年間";
-}
 
-
-//ーーーーーーーーーー総支払関係ーーーーーーーーーー
+//ーーーー国民年金funcーーーー
 
 //宣言:国民総支払func (とりあえず2020年の金額=月16540円で計算)
 function 国民総支払func(){
@@ -183,34 +189,91 @@ function 国民総支払func(){
   国民総支払span.innerHTML = "(支払総額 約" + 国民総支払el + "万円)";
 }
 
-
-//宣言:厚生総支払func (未完了)
-function 厚生総支払func(){
-  if(収入種別radio月.checked){
-    var 厚生総支払el = 厚生年数bar.value * 12 * 0;
-	  if(厚生総支払el <= 9999){
-	  厚生総支払span.innerHTML = "(約" + 厚生総支払el + "万円)";
-	  }
-      else if(厚生総支払el >= 10000){
-	  厚生総支払span.innerHTML = "(約" + 厚生総支払el/10000 + "億円)";
-	  }
-
-  }
-}
-
-//ーーーーーーーーー受給額関係ーーーーーーーー
-
 //宣言:国民受給額func (とりあえず満額を2020年の年額781700円で計算)
 function 国民受給額func(){
   var 国民受給最大年額el = 781700;
   var 国民受給基準年額el = 国民受給最大年額el/40;
   var 国民受給年額el = Math.round(国民受給基準年額el * 国民年数bar.value/10000);
   var 国民受給月額el = Math.round(国民受給基準年額el/12 * 国民年数bar.value/10000);
-  国民受給額div.innerHTML = "国民年金が月額" + 国民受給月額el +"万円 (年額" + 国民受給年額el + "万円)";
+  国民受給額div.innerHTML = "基礎年金は月額" + 国民受給月額el +"万円 (年額" + 国民受給年額el + "万円)";
 }
 
 
- 
+
+//ーーーー厚生年金funcーーーー
+
+function 厚生支払年数func(){
+  厚生年数span.innerHTML = 厚生年数bar.value +"年間";
+  厚生総支払と受給額func()  
+}
+
+//宣言:厚生総支払と受給額func (未完了)
+function 厚生総支払と受給額func(){
+  var 厚生支払年数el = 厚生年数bar.value;
+  var 厚生支払月額el = 月収range.value * 0.09;
+  var 厚生支払年額el = 年収range.value * 0.09;
+  
+  var 基礎年金月額result = Math.round(781700/40 * 厚生支払年数el /12 / 10000)
+  var 基礎年金年額result = Math.round(781700/40 * 厚生支払年数el / 10000)
+  //とりあえず2020年の金額
+  
+  if (収入種別radio月.checked){
+    var 厚生総支払額result = Math.round(厚生支払月額el * 厚生支払年数el * 12);
+    厚生受給年額result = Math.round(厚生総支払額result * 0.0058 * 12);
+    厚生受給月額result = Math.round(厚生受給年額result/12);
+    厚生受給総額result = 厚生受給年額result * (83-65);
+	//↑83の部分は選択値から引くつもり
+	//とりあえず総収入額 * 0.0058で計算 (本当は総支払額から算出したほうがいい)
+    }
+  
+  else if(収入種別radio年.checked){
+    var 厚生総支払額result = Math.round(厚生支払年額el * 厚生支払年数el);
+    厚生受給年額result = Math.round(厚生総支払額result * 0.0058 *12);
+    厚生受給月額result = Math.round(厚生受給年額result/12);
+    厚生受給総額result = 厚生受給年額result * (83-65);
+    }
+	
+  厚生総支払span.innerHTML = "(支払総額 約" + 厚生総支払額result + "万円)";
+  厚生受給額div.innerHTML = "厚生年金が月額" + 厚生受給月額result +"万円 (年額" + 厚生受給年額result + "万円)";
+    if (国民年金cb.checked){
+	  厚生国民分受給額div.innerHTML = "";
+	  国民受給額div.innerHTML = "基礎年金分が月額" + 厚生支払年数el +"万円 (年額" + 国民受給年額el + "万円)";
+	  //国民年金の支払年数を計算して、厚生年金の支払年数と合算しなければいけないため保留
+	}
+	else {
+	  国民受給額div.innerHTML = "";
+	  厚生国民分受給額div.innerHTML = "基礎年金分が月額" + 基礎年金月額result +"万円 (年額" + 基礎年金年額result + "万円)";
+	  合計受給額div.innerHTML = "合計月額" + (基礎年金月額result+厚生受給月額result) + "万円 (年額" + (厚生受給年額result+基礎年金年額result) + "万円)";
+    }
+}
+
+
+//ーーーーーーーーーー計算calcーーーーーーーーーー
+
+//厚生calc (厚生年金の計算に必要な値が動いたら発火&再計算)
+function 厚生calc(){
+  var 厚生支払年数el = 厚生年数bar.value;
+  var 厚生支払月額el = 月収range.value * 10000 * 0.09;
+  var 厚生支払年額el = 年収range.value * 10000 * 0.09;
+  
+  if (収入種別radio月.checked){
+  var 厚生総支払額result = 厚生支払月額el * 厚生支払年数el;
+  厚生受給年額result = Math.round(厚生総支払額result / 厚生支払年数el * 0.0058);
+  厚生受給月額result = Math.round(厚生受給年額result/12);
+  厚生受給総額result = 厚生受給年額result * (83-65);
+  }
+  
+  else if(収入種別radio年.checked){
+  var 厚生総支払額result = 厚生支払月額el * 厚生支払年数el;
+  厚生受給年額result = Math.round(厚生総支払額result / 厚生支払年数el * 0.0058);
+  厚生受給月額result = Math.round(厚生受給年額result/12);
+  厚生受給総額result = 厚生受給年額result * (83-65);
+  }
+
+}
+  
+
+
 </script>
 
 <script src="nenkin.js"></script>
